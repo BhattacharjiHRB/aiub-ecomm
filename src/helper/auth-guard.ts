@@ -5,17 +5,18 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+
 import { Reflector } from '@nestjs/core';
-import { userRole } from 'src/db/entities/user.entity';
+import { ROLES_KEY } from './Roles';
 
 @Injectable()
 export class RoleBasedAuthGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.get<string[]>(
-      userRole,
-      context.getHandler(),
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
     );
 
     if (!requiredRoles) {
@@ -23,6 +24,7 @@ export class RoleBasedAuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
+
     const user = request.user;
 
     if (!user) {

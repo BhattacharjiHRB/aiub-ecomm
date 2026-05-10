@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { userRole } from 'src/db/entities/user.entity';
 import { RoleBasedAuthGuard } from 'src/helper/auth-guard';
+import { JwtGuard } from 'src/helper/jwt-guard';
 import { Roles } from 'src/helper/Roles';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -57,7 +58,7 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @UseGuards(RoleBasedAuthGuard)
+  @UseGuards(RoleBasedAuthGuard, JwtGuard)
   @Roles(userRole.ADMIN)
   @Get('merchants/inactive')
   findInactiveMerchants() {
