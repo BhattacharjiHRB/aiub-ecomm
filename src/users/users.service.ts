@@ -145,9 +145,9 @@ export class UsersService {
     }
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     try {
-      const user = this.userRepo.findOne({
+      const user = await this.userRepo.findOne({
         where: {
           id: id,
         },
