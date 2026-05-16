@@ -20,21 +20,19 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(RoleBasedAuthGuard)
-  @Roles(userRole.ADMIN)
-  @Post('merchants')
+  @Post('merchants/register')
   async createMerchants(@Body() userDto: CreateUserDto) {
     return this.usersService.create(userDto);
   }
 
-  @UseGuards(RoleBasedAuthGuard)
+  @UseGuards(RoleBasedAuthGuard, JwtGuard)
   @Roles(userRole.ADMIN)
   @Get('merchants/active')
   allMerchants() {
     return this.usersService.findAllMerchants();
   }
 
-  @UseGuards(RoleBasedAuthGuard)
+  @UseGuards(RoleBasedAuthGuard, JwtGuard)
   @Roles(userRole.ADMIN)
   @Get('all')
   allUsers() {
@@ -51,7 +49,7 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @UseGuards(RoleBasedAuthGuard)
+  @UseGuards(RoleBasedAuthGuard, JwtGuard)
   @Roles(userRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
@@ -65,14 +63,14 @@ export class UsersController {
     return this.usersService.allInactiveMerchants();
   }
 
-  @UseGuards(RoleBasedAuthGuard)
+  @UseGuards(RoleBasedAuthGuard, JwtGuard)
   @Roles(userRole.ADMIN)
   @Get('merchants/all')
   getAllMerchants() {
     return this.usersService.getAllMerchants();
   }
 
-  @UseGuards(RoleBasedAuthGuard)
+  @UseGuards(RoleBasedAuthGuard, JwtGuard)
   @Roles(userRole.ADMIN)
   @Patch('merchants/approve/:id')
   approveMerchant(
