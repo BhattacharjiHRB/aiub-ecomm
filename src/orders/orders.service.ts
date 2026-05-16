@@ -15,6 +15,7 @@ import { Order, OrderItem } from 'src/db/entities/order.entity';
 import { Products } from 'src/db/entities/product.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class OrdersService {
@@ -30,6 +31,7 @@ export class OrdersService {
 
     @InjectRepository(Cart)
     private readonly cartRepo: Repository<Cart>,
+     private readonly mailService: MailService,
   ) {}
 
   async createOrder(dto: CreateOrderDto) {

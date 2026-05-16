@@ -9,6 +9,7 @@ import { dbService } from './db/db.service';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   controllers: [AppController],
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
     TypeOrmModule.forRootAsync({ useClass: dbService }),
     OrdersModule,
     CartModule,
+    MailModule,
   ],
 })
 export class AppModule {}
