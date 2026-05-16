@@ -19,6 +19,8 @@ export class CreateProductDto {
   @IsOptional()
   description?: string;
 
+  imageUrl?: string[];
+
   @IsNumber()
   @IsPositive()
   @Type(() => Number)

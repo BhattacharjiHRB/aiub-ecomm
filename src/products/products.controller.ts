@@ -1,28 +1,48 @@
+// products.controller.ts
+
 import {
   Body,
   Controller,
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Put,
-  Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+
+import { FilesInterceptor } from '@nestjs/platform-express';
+
+import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import {
   PartialUpdateProductDto,
   UpdateProductDto,
 } from './dto/update-product.dto';
-import { ProductsService } from './products.service';
+import { multerConfig } from 'src/helper/multer.config';
+
+
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  create(@Body() dto: CreateProductDto) {
+  @UseInterceptors(
+    FilesInterceptor('images', 10, multerConfig),
+  )
+  create(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() dto: CreateProductDto,
+  ) {
+    const imageUrls = files.map(
+      (file) => `/uploads/${file.filename}`,
+    );
+
+    dto.imageUrl = imageUrls;
+
     return this.productsService.create(dto);
   }
 
@@ -31,44 +51,49 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
-  @Get('search')
-  search(@Query('keyword') keyword: string) {
-    return this.productsService.search(keyword);
-  }
-
-  @Get('category/:cat')
-  findByCategory(@Param('cat') cat: string) {
-    return this.productsService.findByCategory(cat);
-  }
-
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.productsService.findOne(+id);
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    FilesInterceptor('images', 10, multerConfig),
+  )
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: PartialUpdateProductDto,
   ) {
-    return this.productsService.update(id, dto);
+    if (files?.length) {
+      dto.imageUrl = files.map(
+        (file) => `/uploads/${file.filename}`,
+      );
+    }
+
+    return this.productsService.update(+id, dto);
   }
 
   @Put(':id')
+  @UseInterceptors(
+    FilesInterceptor('images', 10, multerConfig),
+  )
   replace(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: UpdateProductDto,
   ) {
-    return this.productsService.replace(id, dto);
+    if (files?.length) {
+      dto.imageUrl = files.map(
+        (file) => `/uploads/${file.filename}`,
+      );
+    }
+
+    return this.productsService.replace(+id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.remove(id);
-  }
-
-  @Patch(':id/toggle')
-  toggle(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.toggleActive(id);
+  remove(@Param('id') id: string) {
+    return this.productsService.remove(+id);
   }
 }
