@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -25,13 +26,12 @@ import {
   UpdateProductDto,
 } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
-
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.MERCHANT, userRole.ADMIN)
+  @UseGuards(JwtGuard, RoleBasedAuthGuard)
+  @Roles(userRole.MERCHANT)
   @Post()
   @UseInterceptors(FilesInterceptor('images', 10, multerConfig))
   create(
@@ -54,8 +54,8 @@ export class ProductsController {
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
   }
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.MERCHANT, userRole.ADMIN)
+  @UseGuards(JwtGuard, RoleBasedAuthGuard)
+  @Roles(userRole.MERCHANT)
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images', 10, multerConfig))
   update(
@@ -70,8 +70,8 @@ export class ProductsController {
     return this.productsService.update(+id, dto);
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.MERCHANT, userRole.ADMIN)
+  @UseGuards(JwtGuard, RoleBasedAuthGuard)
+  @Roles(userRole.MERCHANT)
   @Put(':id')
   @UseInterceptors(FilesInterceptor('images', 10, multerConfig))
   replace(
@@ -86,10 +86,15 @@ export class ProductsController {
     return this.productsService.replace(+id, dto);
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
+  @UseGuards(JwtGuard, RoleBasedAuthGuard)
   @Roles(userRole.MERCHANT, userRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productsService.remove(+id);
+  }
+
+  @Get('search/:keyword')
+  search(@Query('keyword') keyword: string) {
+    return this.productsService.search(keyword);
   }
 }
