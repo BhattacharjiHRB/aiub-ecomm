@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class Products {
@@ -31,6 +33,11 @@ export class Products {
 
   @Column({ default: true })
   isActive!: boolean;
+
+  @ManyToOne(() => User, (user) => user.products, {
+    onDelete: 'CASCADE',
+  })
+  userId!: User;
 
   @CreateDateColumn()
   createdAt!: Date;

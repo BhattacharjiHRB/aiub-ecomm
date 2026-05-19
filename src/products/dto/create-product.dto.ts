@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  Allow,
   IsBoolean,
   IsInt,
   IsNotEmpty,
@@ -19,7 +20,8 @@ export class CreateProductDto {
   @IsOptional()
   description?: string;
 
-  imageUrl?: string[];
+  @Allow()
+  imageUrl!: string[];
 
   @IsNumber()
   @IsPositive()

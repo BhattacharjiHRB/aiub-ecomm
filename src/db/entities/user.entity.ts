@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Products } from './product.entity';
 
 export enum userRole {
   ADMIN = 'admin',
@@ -40,6 +42,9 @@ export class User {
 
   @Column({ default: false })
   public isActive!: boolean;
+
+  @OneToMany(() => Products, (product) => product.userId)
+  products?: Products[];
 
   @Column()
   @CreateDateColumn()
