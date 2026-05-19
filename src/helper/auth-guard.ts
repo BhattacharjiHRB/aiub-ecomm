@@ -1,44 +1,49 @@
+// auth-guard.ts
+
 import {
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from './Roles';
 
 @Injectable()
-export class RoleBasedAuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+export class RoleBasedAuthGuard
+  implements CanActivate
+{
+  constructor(
+    private reflector: Reflector,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+  canActivate(
+    context: ExecutionContext,
+  ): boolean {
+    const requiredRoles =
+      this.reflector.getAllAndOverride<string[]>(
+        'roles',
+        [
+          context.getHandler(),
+          context.getClass(),
+        ],
+      );
 
     if (!requiredRoles) {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request =
+      context.switchToHttp().getRequest();
 
     const user = request.user;
 
-    if (!user) {
-      throw new UnauthorizedException('User not authenticated');
-    }
+    console.log('USER =>', user);
 
-    const hasRole = requiredRoles.includes(user.role);
+    console.log(
+      'REQUIRED ROLES =>',
+      requiredRoles,
+    );
 
-    if (!hasRole) {
-      throw new ForbiddenException(
-        'Insufficient permissions for this resource',
-      );
-    }
-
-    return true;
+    return requiredRoles.includes(user.role);
   }
 }
