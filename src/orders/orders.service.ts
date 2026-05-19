@@ -13,9 +13,9 @@ import { Repository } from 'typeorm';
 import { Cart } from 'src/db/entities/cart.entity';
 import { Order, OrderItem } from 'src/db/entities/order.entity';
 import { Products } from 'src/db/entities/product.entity';
+import { MailService } from 'src/mail/mail.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class OrdersService {
@@ -31,7 +31,7 @@ export class OrdersService {
 
     @InjectRepository(Cart)
     private readonly cartRepo: Repository<Cart>,
-     private readonly mailService: MailService,
+    private readonly mailService: MailService,
   ) {}
 
   async createOrder(dto: CreateOrderDto) {
@@ -49,7 +49,6 @@ export class OrdersService {
 
       let total = 0;
 
-      // 1. Create Order
       const order = this.orderRepo.create({
         user: cart.user,
         totalPrice: 0,
@@ -57,7 +56,6 @@ export class OrdersService {
 
       const savedOrder = await this.orderRepo.save(order);
 
-      // 2. Create Order Items + Decrease Stock
       const orderItems: OrderItem[] = [];
 
       for (const item of cart.items) {
@@ -68,19 +66,16 @@ export class OrdersService {
 
         total += subtotal;
 
-        // 🔥 CHECK STOCK
         if (stock < item.quantity) {
           throw new BadRequestException(`Not enough stock for ${product.name}`);
         }
 
-        // 🔥 DECREASE STOCK (safe way)
         await this.productRepo.decrement(
           { id: product.id },
           'stock',
           item.quantity,
         );
 
-        // Create order item
         const orderItem = this.orderItemRepo.create({
           order: savedOrder,
           product,
@@ -91,16 +86,13 @@ export class OrdersService {
         orderItems.push(orderItem);
       }
 
-      // 3. Save all order items at once
       if (orderItems.length > 0) {
         await this.orderItemRepo.save(orderItems);
       }
 
-      // 4. Update total price
       savedOrder.totalPrice = total;
       await this.orderRepo.save(savedOrder);
 
-      // 5. Return full order with relations
       const newOrder = await this.orderRepo.findOne({
         where: { id: savedOrder.id },
         relations: {

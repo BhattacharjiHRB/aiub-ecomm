@@ -30,8 +30,6 @@ import { ProductsService } from './products.service';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @UseGuards(JwtGuard, RoleBasedAuthGuard)
-  @Roles(userRole.MERCHANT)
   @Post()
   @UseInterceptors(FilesInterceptor('images', 10, multerConfig))
   create(

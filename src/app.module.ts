@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -16,6 +18,14 @@ import { UsersModule } from './users/users.module';
   controllers: [AppController],
   providers: [AppService, dbService],
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public/',
+      serveStaticOptions: {
+        index: false,
+        fallthrough: false,
+      },
+    }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '24h' },

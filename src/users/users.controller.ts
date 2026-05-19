@@ -6,12 +6,7 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
-import { userRole } from 'src/db/entities/user.entity';
-import { RoleBasedAuthGuard } from 'src/helper/auth-guard';
-import { JwtGuard } from 'src/helper/jwt-guard';
-import { Roles } from 'src/helper/Roles';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
@@ -25,15 +20,11 @@ export class UsersController {
     return this.usersService.create(userDto);
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.ADMIN)
   @Get('merchants/active')
   allMerchants() {
     return this.usersService.findAllMerchants();
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.ADMIN)
   @Get('all')
   allUsers() {
     return this.usersService.findAllUser();
@@ -49,29 +40,21 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.ADMIN)
   @Get('merchants/inactive')
   findInactiveMerchants() {
     return this.usersService.allInactiveMerchants();
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.ADMIN)
   @Get('merchants/all')
   getAllMerchants() {
     return this.usersService.getAllMerchants();
   }
 
-  @UseGuards(RoleBasedAuthGuard, JwtGuard)
-  @Roles(userRole.ADMIN)
   @Patch('merchants/approve/:id')
   approveMerchant(
     @Param('id') id: string,
